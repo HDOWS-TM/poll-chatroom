@@ -45,7 +45,7 @@ node <sites-skill>/scripts/publish.js --dir . --language node \
 仓库自带 `Dockerfile`、`docker-compose.yml`、`.dockerignore`。
 
 ```bash
-git clone https://github.com/123fcgj/poll-chatroom.git
+git clone https://github.com/HDOWS-TM/poll-chatroom.git
 cd poll-chatroom
 
 # 方式一：Compose（含健康检查 + 数据卷 + 自动重启）
@@ -70,7 +70,7 @@ docker run -d --name poll-chatroom -p 3000:3000 \
 ### 1. 起服务
 
 ```bash
-git clone https://github.com/123fcgj/poll-chatroom.git /opt/poll-chatroom
+git clone https://github.com/HDOWS-TM/poll-chatroom.git /opt/poll-chatroom
 cd /opt/poll-chatroom
 PORT=3000 node server.js          # 先前台跑一次确认，Ctrl+C 退出
 curl -s http://127.0.0.1:3000/api/health
@@ -158,7 +158,7 @@ server {
 ## E. 内网穿透（本机临时分享）
 
 ```bash
-git clone https://github.com/123fcgj/poll-chatroom.git && cd poll-chatroom
+git clone https://github.com/HDOWS-TM/poll-chatroom.git && cd poll-chatroom
 PORT=3000 node server.js &
 
 npx localtunnel --port 3000

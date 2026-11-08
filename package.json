@@ -4,12 +4,12 @@
   "private": true,
   "description": "轻量轮询式多人聊天室（0.5~2.5s 延迟，无需 WebSocket，零依赖）",
   "license": "MIT",
-  "author": "123fcgj",
+  "author": "HDOWS-TM",
   "repository": {
     "type": "git",
-    "url": "https://github.com/123fcgj/poll-chatroom.git"
+    "url": "https://github.com/HDOWS-TM/poll-chatroom.git"
   },
-  "homepage": "https://github.com/123fcgj/poll-chatroom#readme",
+  "homepage": "https://github.com/HDOWS-TM/poll-chatroom#readme",
   "scripts": {
     "start": "node server.js"
   },

@@ -2,7 +2,7 @@
 
 一个**轻量多人聊天室**：不用 WebSocket，靠 HTTP 轮询同步消息，延迟 **0.5~2.5 秒**（每次随机抖动，避免所有人同时请求）。单端口 Node 服务、**零第三方依赖**、Node >= 18。
 
-> 开源仓库：<https://github.com/123fcgj/poll-chatroom> · MIT 许可证
+> 开源仓库：<https://github.com/HDOWS-TM/poll-chatroom> · MIT 许可证
 >
 > **想让 AI 帮你自动部署？** 把 [`ONE_CLICK_PROMPT.md`](ONE_CLICK_PROMPT.md) 里的提示词整段复制给任意 AI 助手（WorkBuddy / Cursor / Claude Code / Copilot 等）即可，它不依赖特定平台。
 

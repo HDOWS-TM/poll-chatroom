@@ -64,7 +64,7 @@ node <sites-skill>/scripts/publish.js --dir <repo-dir> --language node \
 ### B. Docker（推荐，跨平台最稳）
 
 ```bash
-git clone https://github.com/123fcgj/poll-chatroom.git
+git clone https://github.com/HDOWS-TM/poll-chatroom.git
 cd poll-chatroom
 docker compose up -d --build
 curl -s http://localhost:3000/api/health
@@ -83,7 +83,7 @@ docker run -d --name poll-chatroom -p 3000:3000 -v "$(pwd)/data:/app/data" poll-
 ### C. 裸 Node + 反向代理（VPS / 云主机）
 
 ```bash
-git clone https://github.com/123fcgj/poll-chatroom.git
+git clone https://github.com/HDOWS-TM/poll-chatroom.git
 cd poll-chatroom
 PORT=3000 node server.js          # 前台验证；生产用 systemd / pm2 / supervisor 守护
 curl -s http://127.0.0.1:3000/api/health
@@ -107,7 +107,7 @@ curl -s http://127.0.0.1:3000/api/health
 ### E. 内网穿透（本机临时分享链接）
 
 ```bash
-git clone https://github.com/123fcgj/poll-chatroom.git && cd poll-chatroom
+git clone https://github.com/HDOWS-TM/poll-chatroom.git && cd poll-chatroom
 PORT=3000 node server.js &
 npx localtunnel --port 3000
 # 或：cloudflared tunnel --url http://localhost:3000
