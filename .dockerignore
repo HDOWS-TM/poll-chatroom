@@ -1,0 +1,9 @@
+.git
+.gitignore
+.codebuddy
+.cloudstudio
+data
+node_modules
+*.log
+*.md
+!README.md

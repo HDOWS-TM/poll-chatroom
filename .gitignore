@@ -1,0 +1,17 @@
+# 运行时聊天记录：含用户消息/图片，绝不提交到公开仓库
+data/
+*.log
+
+# 依赖与本地环境
+node_modules/
+.env
+.env.*
+.DS_Store
+
+# 沙箱 / 平台专用配置（含绝对路径，不通用）
+.cloudstudio
+.codebuddy/
+
+# 编辑器
+.idea/
+.vscode/

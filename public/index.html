@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>轮询聊天室</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+
+  <!-- 昵称设置 -->
+  <div id="nickModal" class="modal">
+    <div class="modal-box">
+      <div class="modal-logo">💬</div>
+      <h2>进入聊天室</h2>
+      <p class="modal-sub">消息通过轮询同步，延迟约 0.5~2.5 秒</p>
+      <input id="nickInput" type="text" maxlength="16" placeholder="给自己起个昵称" autocomplete="off" />
+      <button id="nickConfirm" class="btn primary wide">进入</button>
+    </div>
+  </div>
+
+  <div class="app">
+    <!-- 侧栏 -->
+    <aside class="sidebar">
+      <div class="brand"><span class="brand-icon">💬</span><span>轮询聊天室</span></div>
+
+      <div class="side-section">
+        <div class="side-title">房间 <button id="addRoomBtn" class="mini-btn" title="新建房间">＋</button></div>
+        <div id="roomList" class="room-list"></div>
+      </div>
+
+      <div class="side-section grow">
+        <div class="side-title">在线 <span id="onlineCount" class="pill">0</span></div>
+        <div id="userList" class="user-list"></div>
+      </div>
+
+      <div class="side-foot">
+        <div class="me">
+          <span id="meAvatar" class="avatar sm">我</span>
+          <span id="meNick" class="me-nick">—</span>
+          <button id="editNick" class="mini-btn" title="修改昵称">✎</button>
+        </div>
+        <div class="delay-note">轮询间隔 <b id="delayLabel">—</b></div>
+      </div>
+    </aside>
+
+    <!-- 主区 -->
+    <main class="main">
+      <header class="topbar">
+        <button id="mobileMenu" class="mini-btn mobile-only" title="房间列表">☰</button>
+        <div class="room-title">
+          <span class="hash">#</span><span id="currentRoom">大厅</span>
+        </div>
+        <div class="top-right">
+          <span id="connStatus" class="conn ok"><i></i> 已连接</span>
+          <span id="topOnline" class="pill">0 在线</span>
+          <a class="gh-link" href="https://github.com/123fcgj/poll-chatroom" target="_blank" rel="noopener noreferrer" title="在 GitHub 上查看源码与部署指南">GitHub ↗</a>
+        </div>
+      </header>
+
+      <div id="msgScroll" class="msg-scroll">
+        <button id="loadMore" class="load-more">加载更早的消息</button>
+        <div id="msgList" class="msg-list"></div>
+        <div id="typingBar" class="typing-bar"></div>
+      </div>
+
+      <div class="composer">
+        <div class="composer-tools">
+          <button id="emojiBtn" class="tool-btn" title="表情">😊</button>
+          <button id="imageBtn" class="tool-btn" title="发送图片">🖼️</button>
+          <input id="imageInput" type="file" accept="image/*" hidden />
+        </div>
+        <textarea id="msgInput" rows="1" maxlength="2000" placeholder="输入消息，Enter 发送 / Shift+Enter 换行"></textarea>
+        <button id="sendBtn" class="btn primary send-btn">发送</button>
+      </div>
+      <div id="emojiPanel" class="emoji-panel hidden"></div>
+    </main>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+  <script src="/app.js"></script>
+</body>
+</html>

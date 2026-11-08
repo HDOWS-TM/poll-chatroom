@@ -1,0 +1,14 @@
+# Render Blueprint：导入 GitHub 仓库后自动识别，一键创建 Web Service
+# 文档：https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: poll-chatroom
+    runtime: node
+    plan: free
+    buildCommand: npm install      # 零依赖，瞬间完成；也确保各平台习惯的构建阶段不报错
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      # PORT 由平台自动注入，server.js 读取 process.env.PORT，无需手动设置

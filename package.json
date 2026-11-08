@@ -1,0 +1,19 @@
+{
+  "name": "polling-chatroom",
+  "version": "1.0.0",
+  "private": true,
+  "description": "轻量轮询式多人聊天室（0.5~2.5s 延迟，无需 WebSocket，零依赖）",
+  "license": "MIT",
+  "author": "123fcgj",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/123fcgj/poll-chatroom.git"
+  },
+  "homepage": "https://github.com/123fcgj/poll-chatroom#readme",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
