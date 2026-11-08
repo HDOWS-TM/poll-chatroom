@@ -12,8 +12,6 @@
 请帮我把这个开源项目部署成一个公网可访问的在线聊天室，最后把带完整参数的分享链接发给我。
 
 项目仓库：https://github.com/123fcgj/poll-chatroom
-效果参考（已部署好的实例，只作为参考，不要修改或污染它）：
-https://ac23fbfe7ca5296b0.app.workbuddy.host/?sharecode=4ADO5PUJOC
 
 执行步骤：
 1. 克隆仓库到你的工作目录。
