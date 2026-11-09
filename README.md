@@ -1,5 +1,7 @@
 # 轮询聊天室（Poll Chatroom）
 
+[![Node.js CI](https://github.com/HDOWS-TM/poll-chatroom/actions/workflows/node-ci.yml/badge.svg)](https://github.com/HDOWS-TM/poll-chatroom/actions/workflows/node-ci.yml)
+
 一个**轻量多人聊天室**：不用 WebSocket，靠 HTTP 轮询同步消息，延迟 **0.5~2.5 秒**（每次随机抖动，避免所有人同时请求）。单端口 Node 服务、**零第三方依赖**、Node >= 18。
 
 > 开源仓库：<https://github.com/HDOWS-TM/poll-chatroom> · MIT 许可证
@@ -24,6 +26,8 @@ docker compose up -d --build   # 或 Docker
 ```
 
 打开 `http://localhost:3000`。服务读取 `PORT` 环境变量并绑定 `0.0.0.0`，可直接发布为在线应用。
+
+本地自检（零依赖、无需安装）：`npm test` 会在临时目录启动一份隔离服务，验证页面、静态资源与全部 API，不会写入项目里的 `data/`。GitHub Actions 在 Node 18 / 20 / 22 上自动运行同一套检查（[`.github/workflows/node-ci.yml`](.github/workflows/node-ci.yml)）。
 
 ## 功能（进阶版）
 

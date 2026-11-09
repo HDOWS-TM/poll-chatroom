@@ -11,7 +11,8 @@
   },
   "homepage": "https://github.com/HDOWS-TM/poll-chatroom#readme",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "node test/smoke.js"
   },
   "engines": {
     "node": ">=18"
