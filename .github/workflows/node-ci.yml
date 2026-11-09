@@ -6,6 +6,11 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      preview_minutes:
+        description: "公网预览地址保留时长（分钟，1-30）"
+        type: number
+        default: 5
 
 permissions:
   contents: read
@@ -37,19 +42,158 @@ jobs:
       - name: 冒烟测试（启动服务 + 验证页面与 API）
         run: npm test
 
-      - name: 服务启动验证（显式后台运行）
+      - name: 服务启动验证 + 输出访问地址
         run: |
           PORT=3000 node server.js > /tmp/chatroom.log 2>&1 &
           echo $! > /tmp/chatroom.pid
+          OK=0
           for i in $(seq 1 20); do
-            if curl -fsS http://127.0.0.1:3000/api/health; then
-              echo ""
-              echo "✅ 服务已在 Actions runner 上启动并通过健康检查"
-              kill "$(cat /tmp/chatroom.pid)" 2>/dev/null || true
-              exit 0
-            fi
+            if curl -fsS http://127.0.0.1:3000/api/health > /dev/null; then OK=1; break; fi
             sleep 1
           done
-          echo "❌ 服务未就绪，日志："
-          cat /tmp/chatroom.log
-          exit 1
+          if [ "$OK" != "1" ]; then
+            echo "服务未就绪，日志："
+            cat /tmp/chatroom.log
+            exit 1
+          fi
+          echo "服务已启动并通过健康检查：http://127.0.0.1:3000/ （仅 CI 内部可访问）"
+          {
+            echo "### 本次运行输出的地址（Node ${{ matrix.node }}）"
+            echo ""
+            echo "| 项 | 地址 |"
+            echo "|----|------|"
+            echo "| Runner 本地聊天室 | \`http://127.0.0.1:3000/\` |"
+            echo "| 本地健康检查 | \`http://127.0.0.1:3000/api/health\` |"
+            echo "| 本次 Actions 运行 | $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID |"
+            echo ""
+            echo "> 本地地址只在 CI 内部有效，**公网无法访问**。想要可点击的公网地址："
+            echo "> 在 Actions 页手动运行本工作流（Run workflow），查看「公网预览地址」这个 job 的 Summary。"
+          } >> "$GITHUB_STEP_SUMMARY"
+          kill "$(cat /tmp/chatroom.pid)" 2>/dev/null || true
+
+  preview:
+    name: 公网预览地址
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 安装 Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 启动服务并建立临时公网隧道
+        id: tunnel
+        env:
+          PREVIEW_MINUTES: ${{ github.event.inputs.preview_minutes || '5' }}
+        run: |
+          set +e
+          PORT=3000 node server.js > /tmp/chatroom.log 2>&1 &
+          echo $! > /tmp/chatroom.pid
+          OK=0
+          for i in $(seq 1 20); do
+            if curl -fsS http://127.0.0.1:3000/api/health > /dev/null; then OK=1; break; fi
+            sleep 1
+          done
+          if [ "$OK" != "1" ]; then
+            echo "服务未就绪，日志："
+            cat /tmp/chatroom.log
+            exit 1
+          fi
+          echo "聊天室已在 runner 上启动：http://127.0.0.1:3000/"
+
+          curl -fsSL --retry 3 -o /tmp/cloudflared \
+            https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64
+          chmod +x /tmp/cloudflared
+          /tmp/cloudflared tunnel --url http://127.0.0.1:3000 > /tmp/tunnel.log 2>&1 &
+          echo $! > /tmp/tunnel.pid
+
+          URL=""
+          for i in $(seq 1 45); do
+            URL=$(grep -oE 'https://[a-zA-Z0-9._-]+\.trycloudflare\.com' /tmp/tunnel.log | head -1)
+            [ -n "$URL" ] && break
+            sleep 1
+          done
+
+          HEALTH="未验证"
+          if [ -n "$URL" ]; then
+            for i in $(seq 1 15); do
+              CODE=$(curl -s -o /dev/null -w '%{http_code}' -m 10 "$URL/api/health")
+              if [ "$CODE" = "200" ]; then HEALTH="HTTP 200（页面可访问）"; break; fi
+              sleep 2
+            done
+            [ "$HEALTH" = "未验证" ] && HEALTH="隧道已建立但健康检查未通过（可能需稍等片刻再刷新）"
+          fi
+
+          MIN="$PREVIEW_MINUTES"
+          case "$MIN" in ''|*[!0-9]*) MIN=5 ;; esac
+          [ "$MIN" -lt 1 ] && MIN=1
+          [ "$MIN" -gt 30 ] && MIN=30
+          echo "minutes=$MIN" >> "$GITHUB_OUTPUT"
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+
+          echo ""
+          echo "=========================================================="
+          if [ -n "$URL" ]; then
+            echo "聊天室公网预览地址：$URL"
+            echo "健康检查：$HEALTH"
+          else
+            echo "公网隧道未能建立，本次仅输出 runner 本地地址：http://127.0.0.1:3000/"
+            echo "cloudflared 日志："
+            tail -20 /tmp/tunnel.log
+          fi
+          echo "=========================================================="
+          echo ""
+
+          {
+            echo "## 聊天室访问地址"
+            echo ""
+            if [ -n "$URL" ]; then
+              echo "**公网预览地址（点击即可打开聊天室）：** [$URL]($URL)"
+              echo ""
+              echo "- 健康检查：$HEALTH"
+              echo "- 本地自检地址：\`http://127.0.0.1:3000/\`（仅 CI 内部）"
+            else
+              echo "公网隧道未能建立，本次没有可点击的公网地址。"
+              echo "可重跑本工作流，或直接按 README / DEPLOY.md 自行部署。"
+              echo ""
+              echo "- Runner 本地地址：\`http://127.0.0.1:3000/\`（仅 CI 内部）"
+            fi
+            echo ""
+            echo "| 项 | 值 |"
+            echo "|----|----|"
+            echo "| 地址有效期 | 本次运行结束后即失效（约 $MIN 分钟） |"
+            echo "| 本次运行 | $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID |"
+            echo "| 仓库 | $GITHUB_SERVER_URL/$GITHUB_REPOSITORY |"
+            echo ""
+            echo "> 这是 GitHub Actions 临时虚拟机上的演示实例：无鉴权、拿到链接即可读写，"
+            echo "> 请勿发送敏感内容；job 结束后链接失效。需要长期在线请按 [DEPLOY.md](DEPLOY.md) 部署。"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          if [ -n "$URL" ]; then
+            echo "::notice title=聊天室公网预览地址::$URL"
+          else
+            echo "::warning title=公网隧道::未能建立临时公网地址，详见 Summary"
+          fi
+          exit 0
+
+      - name: 保持预览地址可用（${{ steps.tunnel.outputs.minutes }} 分钟）
+        env:
+          URL: ${{ steps.tunnel.outputs.url }}
+          MIN: ${{ steps.tunnel.outputs.minutes }}
+        run: |
+          if [ -n "$URL" ]; then
+            echo "预览地址：$URL"
+            echo "保持 $MIN 分钟，期间可直接访问；结束后本次运行完成、链接失效。"
+            sleep $((MIN * 60))
+          else
+            echo "无公网地址，跳过保持阶段。"
+          fi
+
+      - name: 清理进程
+        if: always()
+        run: |
+          kill "$(cat /tmp/tunnel.pid)" 2>/dev/null || true
+          kill "$(cat /tmp/chatroom.pid)" 2>/dev/null || true

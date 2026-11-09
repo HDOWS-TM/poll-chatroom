@@ -169,6 +169,8 @@ npx localtunnel --port 3000
 把输出的 `https://xxxx.loca.lt`、`https://xxxx.trycloudflare.com` 直接发给别人即可，无需服务器。
 局限：本机一关链接就失效；localtunnel 首次访问可能要输一个验证密码；不适合长期使用。
 
+> 不想在本机开终端？Fork 仓库后到 **Actions** 页手动运行 **Node.js CI**，工作流会自动拉起服务、建立临时隧道，并把公网地址输出在本次运行的 Summary 里。步骤见 [README](README.md) 的「Fork 后用 GitHub Actions 跑起来」。性质与本节相同：runner 是一次性虚拟机，job 结束链接即失效。
+
 ---
 
 ## F. Serverless（不兼容，需改造）
